@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление - TaxiShop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">TaxiShop <i class="fa-solid fa-taxi"></i></a>
+            <div class="driver-info"><i class="fa-solid fa-id-badge"></i> Водитель: Иван Петров</div>
+            <div class="header-actions">
+                <a href="cart.html" class="cart-btn"><i class="fa-solid fa-shopping-cart"></i><span class="cart-badge">3</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 30px; padding-bottom: 50px;">
+        <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 20px;">Оформление заказа</h1>
+
+        <div class="checkout-layout">
+            <!-- Левая часть 60% (Форма) -->
+            <div class="checkout-form">
+                <div class="form-group">
+                    <label>Ваше имя</label>
+                    <input type="text" class="form-control" placeholder="Например: Алишер">
+                </div>
+                <div class="form-group">
+                    <label>Номер телефона</label>
+                    <input type="tel" class="form-control" placeholder="+998 __ ___ __ __">
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <label style="font-size: 20px; color: var(--text-main);">Способ оплаты</label>
+                    <div class="payment-methods">
+                        <label class="payment-method active">
+                            <input type="radio" name="payment" checked>
+                            <i class="fa-solid fa-money-bill-wave"></i> 💵 Наличные водителю
+                        </label>
+                        <label class="payment-method">
+                            <input type="radio" name="payment">
+                            <i class="fa-solid fa-qrcode"></i> 📱 QR-код (Paynet / Xolis)
+                        </label>
+                        <label class="payment-method">
+                            <input type="radio" name="payment">
+                            <i class="fa-solid fa-truck"></i> 🚚 Оплата при доставке
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Блок адреса (Визуально показываем) -->
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Адрес доставки (только для заказа на дом)</label>
+                    <textarea class="form-control" rows="3" placeholder="Укажите район, улицу, дом, квартиру..."></textarea>
+                </div>
+            </div>
+
+            <!-- Правая часть 40% (Сводка) -->
+            <div class="checkout-summary">
+                <h3 style="font-size: 24px; margin-bottom: 20px;">Ваш заказ</h3>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <div>Вода Hydrolife 0.5л <span style="color:var(--text-muted)">x2</span></div>
+                    <div style="font-weight: 700;">8 000 сум</div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                    <div>Кабель Type-C <span style="color:var(--text-muted)">x1</span></div>
+                    <div style="font-weight: 700;">45 000 сум</div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0;">
+                    <div style="font-size: 20px; color: var(--text-muted);">К оплате:</div>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--primary);">53 000 сум</div>
+                </div>
+
+                <a href="thanks.html" class="btn btn-primary btn-block" style="font-size: 20px;">Подтвердить заказ</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Простой скрипт для смены активного класса у радио-кнопок -->
+    <script>
+        document.querySelectorAll('.payment-method input').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('active'));
+                if(this.checked) this.closest('.payment-method').classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
