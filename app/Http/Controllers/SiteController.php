@@ -87,9 +87,16 @@ class SiteController extends Controller
         $result = $this->siteService->placeOrder($request->all());
         
         if ($result['success']) {
-            return redirect()->route('thanks')->with('order', $result['order']);
+            return redirect()->route('order.thanks', ['number' => $result['order']['number'] ?? '12345']);
         }
         
         return back()->withErrors($result['errors']);
+    }
+    
+    public function orderThanks($number = null)
+    {
+        $data = $this->siteService->getOrderThanksData($number);
+        
+        return view('site.thanks', $data);
     }
 }

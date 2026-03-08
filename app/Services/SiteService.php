@@ -228,6 +228,23 @@ class SiteService
             'hideHeader' => false
         ];
     }
+    
+    public function getOrderThanksData($number = null)
+    {
+        $order = Session::get('last_order', [
+            'number' => $number ?? 'TS-' . str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+            'payment' => 'cash_to_driver',
+            'total' => Session::get('order_total', '54 000 сум')
+        ]);
+        
+        return [
+            'title' => 'Спасибо за заказ',
+            'orderNumber' => $order['number'],
+            'paymentMethod' => $order['payment'],
+            'total' => $order['total'],
+            'hideHeader' => false
+        ];
+    }
 
     public function addToCart($data)
     {
@@ -325,14 +342,18 @@ class SiteService
         }
         
         $order = [
-            'id' => 'TS-' . str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
+            'number' => 'TS-' . str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT),
             'name' => $data['name'] ?? '',
             'phone' => $data['phone'] ?? '',
-            'payment' => $data['payment'] ?? 'cash',
-            'address' => $data['address'] ?? '',
+            'payment' => $data['payment_method'] ?? 'cash_to_driver',
+            'address' => $data['delivery_address'] ?? '',
             'items' => Session::get('cart_items', []),
             'total' => $data['total'] ?? 0
         ];
+        
+        // Сохраняем данные заказа для страницы спасибо
+        Session::put('last_order', $order);
+        Session::put('order_total', $order['total']);
         
         Session::forget('cart');
         Session::forget('cart_items');

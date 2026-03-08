@@ -19,3 +19,4 @@ Route::post('/cart/update', [SiteController::class, 'updateCart'])->name('cart.u
 
 // Order routes
 Route::post('/order/place', [SiteController::class, 'placeOrder'])->name('order.place');
+Route::get('/order/thanks/{number?}', [SiteController::class, 'orderThanks'])->name('order.thanks');
