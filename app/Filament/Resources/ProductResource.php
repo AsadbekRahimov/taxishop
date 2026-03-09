@@ -7,8 +7,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use BackedEnum;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -32,14 +39,14 @@ class ProductResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Основное')
+                Section::make('Основное')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Название')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
 
                         Forms\Components\TextInput::make('slug')
                             ->label('Slug')
@@ -61,7 +68,7 @@ class ProductResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Цены')
+                Section::make('Цены')
                     ->schema([
                         Forms\Components\TextInput::make('price')
                             ->label('Цена продажи')
@@ -81,7 +88,7 @@ class ProductResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Медиа')
+                Section::make('Медиа')
                     ->schema([
                         Forms\Components\FileUpload::make('main_image')
                             ->label('Главное фото')
@@ -112,7 +119,7 @@ class ProductResource extends Resource
                             ->collapsible(),
                     ]),
 
-                Forms\Components\Section::make('Настройки')
+                Section::make('Настройки')
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
                             ->label('Активный')
@@ -187,12 +194,12 @@ class ProductResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('activate')
+                BulkActionGroup::make([
+                    BulkAction::make('activate')
                         ->label('Активировать')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
@@ -200,7 +207,7 @@ class ProductResource extends Resource
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label('Деактивировать')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -208,7 +215,7 @@ class ProductResource extends Resource
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
 
-                    Tables\Actions\DeleteBulkAction::make(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -7,8 +7,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -32,14 +37,14 @@ class CategoryResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Основное')
+                Section::make('Основное')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Название')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state ?? ''))),
 
                         Forms\Components\TextInput::make('slug')
                             ->label('Slug')
@@ -127,9 +132,8 @@ class CategoryResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
-                    ->before(function (Tables\Actions\DeleteAction $action, Category $record) {
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, Category $record) {
                         if ($record->products()->exists()) {
                             $action->cancel();
                             $action->failureNotificationTitle('Невозможно удалить категорию с товарами');
@@ -138,8 +142,8 @@ class CategoryResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

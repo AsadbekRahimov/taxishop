@@ -7,10 +7,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -38,7 +42,7 @@ class OrderResource extends Resource
     {
         return $schema
             ->schema([
-                Infolists\Components\Section::make('Информация о заказе')
+                Section::make('Информация о заказе')
                     ->schema([
                         Infolists\Components\TextEntry::make('order_number')
                             ->label('Номер заказа'),
@@ -101,7 +105,7 @@ class OrderResource extends Resource
                     ])
                     ->columns(2),
 
-                Infolists\Components\Section::make('Состав заказа')
+                Section::make('Состав заказа')
                     ->schema([
                         Infolists\Components\RepeatableEntry::make('items')
                             ->label('')
@@ -231,8 +235,8 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('changeStatus')
+                ViewAction::make(),
+                Action::make('changeStatus')
                     ->label('Сменить статус')
                     ->icon('heroicon-o-arrow-path')
                     ->form([
@@ -249,8 +253,8 @@ class OrderResource extends Resource
                     ->action(fn (Order $record, array $data) => $record->update(['status' => $data['status']])),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('bulkChangeStatus')
+                BulkActionGroup::make([
+                    BulkAction::make('bulkChangeStatus')
                         ->label('Сменить статус')
                         ->icon('heroicon-o-arrow-path')
                         ->form([
