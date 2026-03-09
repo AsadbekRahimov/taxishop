@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(php:*)",
+      "Bash(mkdir:*)",
+      "Bash(cd:*)",
+      "Bash(\"C:/OpenServer/modules/php/PHP_8.3/php.exe\":*)",
+      "Read(//c/OpenServer/modules/php/**)",
+      "Read(//c/OpenServer/modules/**)",
+      "Bash(C:/OpenServer/modules/PHP_8.3/php.exe:*)",
+      "Bash(/c/OpenServer/modules/php/PHP_8.3/php.exe:*)",
+      "Bash(C:/OpenServer/modules/php/PHP_8.3/php.exe:*)"
+    ]
+  }
+}
