@@ -6,8 +6,8 @@ namespace App\Filament\Resources\DriverResource\RelationManagers;
 
 use App\Models\Product;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,9 +22,9 @@ class StockRelationManager extends RelationManager
 
     protected static ?string $pluralModelLabel = 'Товары на складе';
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label('Товар')

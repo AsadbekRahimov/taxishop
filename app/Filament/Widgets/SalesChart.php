@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 
 class SalesChart extends ChartWidget
 {
-    protected static ?string $heading = 'Продажи за 7 дней';
+    protected ?string $heading = 'Продажи за 7 дней';
 
     protected static ?int $sort = 3;
 
