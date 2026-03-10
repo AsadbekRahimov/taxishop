@@ -188,3 +188,210 @@ database/
 └── DatabaseSeeder.php (admin user + тестовые данные)
 
 Сгенерируй ВСЕ файлы полностью, с рабочим кодом. Каждый файл — с полным содержимым, не сокращай. Добавь DatabaseSeeder с тестовым админом (login: admin, password: password) и 3 тестовыми водителями, 5 категорий, 15 товаров.
+
+
+Ты — опытный Laravel full-stack разработчик. У меня есть:
+1) Готовые HTML/CSS/Alpine.js шаблоны фронтенда (7 страниц)
+2) Готовая админ-панель на Filament 5 с моделями и миграциями
+3) ТЗ/PRD проекта TaxiShop
+
+Задача: конвертировать HTML-шаблоны в Blade-шаблоны и создать полный бэкенд (контроллеры, роуты, middleware, сервисы) для Laravel 11 монолита. НЕ API — рендерим Blade-шаблоны на сервере.
+
+=== КОНТЕКСТ ПРОЕКТА ===
+TaxiShop — интернет-магазин на планшетах в такси. Монолитное Laravel 11 приложение. Blade шаблоны + Alpine.js для интерактивности. Session-based корзина. Session auth с remember_token.
+
+=== СУЩЕСТВУЮЩИЕ МОДЕЛИ (уже созданы в Filament) ===
+User, Category, Product, ProductImage, DriverStock, Order, OrderItem
+(все связи и миграции уже есть)
+
+=== ЗАДАЧА 1: BLADE LAYOUT И ШАБЛОНЫ ===
+
+Создать Blade layout и конвертировать HTML в Blade:
+
+resources/views/
+├── layouts/
+│   ├── shop.blade.php          — Основной layout магазина (header, footer, @yield('content'))
+│   └── auth.blade.php          — Layout для страницы логина (минимальный)
+├── auth/
+│   └── login.blade.php         — Форма логина
+├── shop/
+│   ├── home.blade.php          — Главная страница
+│   ├── category.blade.php      — Страница категории
+│   ├── product.blade.php       — Страница товара (PDP)
+│   ├── cart.blade.php          — Корзина
+│   ├── checkout.blade.php      — Оформление заказа
+│   └── thanks.blade.php        — Спасибо за заказ
+└── components/
+├── product-card.blade.php  — Карточка товара (переиспользуемый компонент)
+├── breadcrumbs.blade.php   — Хлебные крошки
+└── header.blade.php        — Шапка сайта
+
+Правила конвертации HTML → Blade:
+- Все статические тексты оставить на русском
+- Все данные выводить через {{ $variable }} (XSS-safe)
+- {!! !!} ТОЛЬКО для доверенного HTML (description товара, если нужен RichText)
+- Условия: @if, @unless, @empty, @isset
+- Циклы: @foreach, @forelse (с @empty для пустых коллекций)
+- Компоненты: <x-product-card :product="$product" :inStock="$inStock" />
+- Ассеты: {{ asset('storage/products/photo.jpg') }}
+- Формы: @csrf во всех формах, @method('DELETE') где нужно
+
+=== ЗАДАЧА 2: КОНТРОЛЛЕРЫ ===
+
+app/Http/Controllers/Auth/LoginController.php
+- showLoginForm(): GET /auth/login → view('auth.login')
+- login(): POST /auth/login
+    * Validate: login (required|string), password (required|string), remember (boolean)
+    * Auth::attempt(['login' => $login, 'password' => $password, 'is_active' => true], $remember)
+    * ВАЖНО: авторизация по полю 'login', НЕ 'email'
+    * Проверить что role === 'driver' ИЛИ 'admin'
+    * Rate limiting: 5 попыток в минуту (throttle middleware)
+    * При успехе → redirect('/')
+    * При ошибке → back()->withErrors()
+- logout(): POST /auth/logout → Auth::logout() → redirect('/auth/login')
+
+app/Http/Controllers/Shop/HomeController.php
+- index(): GET /
+    * $categories = Category::whereNull('parent_id')->with('children')->orderBy('sort_order')->get()
+    * $driverStock = auth()->user()->driverStock()->with('product')->get() — товары в машине
+    * $inStockProductIds = $driverStock->pluck('product_id')->toArray()
+    * $hits = Product::where('is_active', true)->withCount('orderItems')->orderByDesc('order_items_count')->take(8)->get()
+    * return view('shop.home', compact('categories', 'driverStock', 'inStockProductIds', 'hits'))
+
+app/Http/Controllers/Shop/CategoryController.php
+- show($slug): GET /category/{slug}
+    * $category = Category::where('slug', $slug)->firstOrFail()
+    * $products = $category->products()->where('is_active', true)->paginate(12)
+    * Поддержка сортировки: ?sort=price_asc|price_desc|popular|new
+    * $breadcrumbs = собрать цепочку parent категорий
+    * $inStockProductIds из driver_stock текущего водителя
+
+app/Http/Controllers/Shop/ProductController.php
+- show($slug): GET /product/{slug}
+    * $product = Product::where('slug', $slug)->where('is_active', true)->with(['category.parent', 'images'])->firstOrFail()
+    * $inStock = DriverStock::where('driver_id', auth()->id())->where('product_id', $product->id)->exists()
+    * $stockQty = ... количество в машине (если есть)
+    * $breadcrumbs = цепочка категорий
+    * return view('shop.product', compact('product', 'inStock', 'stockQty', 'breadcrumbs'))
+
+app/Http/Controllers/Shop/CartController.php
+Корзина хранится в session: session('cart') = [product_id => ['qty' => N, 'payment_method' => '...'], ...]
+- index(): GET /cart
+    * $cart = session('cart', [])
+    * $products = Product::whereIn('id', array_keys($cart))->get()
+    * Собрать массив с qty, subtotal
+    * $total = сумма
+- add(): POST /cart/add
+    * Validate: product_id (required|exists:products,id), qty (integer|min:1, default 1), payment_method (nullable|in:cash,qr,delivery)
+    * Добавить в session('cart')
+    * Если payment_method передан → redirect('/checkout')
+    * Иначе → redirect('/cart')
+- update(): POST /cart/update
+    * Validate: product_id, qty
+    * Обновить session('cart')
+    * redirect('/cart')
+- remove($id): DELETE /cart/remove/{id}
+    * Удалить product_id из session('cart')
+    * redirect('/cart')
+
+app/Http/Controllers/Shop/CheckoutController.php
+- show(): GET /checkout
+    * Если корзина пуста → redirect('/')
+    * $cart, $products, $total (как в CartController)
+    * return view('shop.checkout', ...)
+- store(): POST /checkout
+    * Validate:
+        - customer_name: required|string|max:255
+        - customer_phone: required|string|regex:/^\+998\d{9}$/
+        - payment_method: required|in:cash,qr,delivery
+        - delivery_address: required_if:payment_method,delivery|string
+    * DB::transaction:
+        - Создать Order (order_number = 'TS-' . str_pad(Order::max('id') + 1, 6, '0', STR_PAD_LEFT))
+        - Создать OrderItems из корзины
+        - Если payment_method === 'cash' и товар в driver_stock → уменьшить quantity в driver_stock
+        - Очистить session('cart')
+    * redirect("/order/{$order->order_number}/thanks")
+
+app/Http/Controllers/Shop/SearchController.php
+- search(): GET /search?q=
+    * $products = Product::where('is_active', true)->where('name', 'LIKE', "%{$q}%")->paginate(12)
+
+=== ЗАДАЧА 3: ROUTES ===
+
+routes/web.php:
+// Auth
+Route::get('/auth/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/auth/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/auth/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Shop (auth:driver middleware)
+Route::middleware(['auth', 'driver'])->group(function () {
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
+Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/order/{number}/thanks', [CheckoutController::class, 'thanks'])->name('order.thanks');
+});
+
+=== ЗАДАЧА 4: MIDDLEWARE ===
+
+app/Http/Middleware/EnsureIsDriver.php
+- Проверяет auth()->user()->role === 'driver'
+- Если нет → abort(403)
+- Зарегистрировать в bootstrap/app.php как alias 'driver'
+
+app/Http/Middleware/EnsureIsAdmin.php (уже может быть от Filament)
+- Проверяет role === 'admin'
+
+=== ЗАДАЧА 5: SERVICE LAYER (опционально, но рекомендуется) ===
+
+app/Services/CartService.php
+- getCart(): array — получить корзину из session
+- addItem(int $productId, int $qty, ?string $paymentMethod): void
+- updateItem(int $productId, int $qty): void
+- removeItem(int $productId): void
+- getTotal(): float
+- getItemsCount(): int
+- clear(): void
+
+app/Services/OrderService.php
+- createOrder(array $data, array $cartItems, int $driverId): Order
+- generateOrderNumber(): string
+- decrementDriverStock(int $driverId, int $productId, int $qty): void
+
+=== ЗАДАЧА 6: HEADER КОРЗИНЫ (глобальный счётчик) ===
+
+app/View/Composers/CartComposer.php (или middleware):
+- На каждой странице в header показывать количество товаров в корзине
+- View::composer('components.header', function ($view) { $view->with('cartCount', app(CartService::class)->getItemsCount()); })
+- Зарегистрировать в AppServiceProvider
+
+=== БЕЗОПАСНОСТЬ (КРИТИЧНО) ===
+- @csrf во ВСЕХ формах
+- {{ }} для ВСЕГО пользовательского вывода (XSS protection)
+- Eloquent ORM — НИКОГДА raw queries с user input (SQL injection)
+- Rate limiting на /auth/login: throttle:5,1
+- Валидация ВСЕХ входных данных в контроллерах
+- FileUpload: валидация MIME-типов (image/*), макс 2MB
+- HTTPS only в production (secure cookies)
+- X-Frame-Options: SAMEORIGIN (планшет может быть в iframe)
+
+=== ВАЖНЫЕ НЮАНСЫ ===
+- User model: поле аутентификации — 'login' (не email). В модели User добавить:
+  public function getAuthIdentifierName() { return 'login'; }
+  и в LoginController использовать Auth::attempt(['login' => ..., 'password' => ...])
+- Корзина — полностью session-based, клиент (пассажир) не регистрируется
+- driver_id в заказе — это auth()->id() (текущий залогиненный водитель)
+- При оплате наличными — автоматически уменьшать driver_stock
+- Изображения хранятся в storage/app/public/, доступ через asset('storage/...')
+- Не забыть php artisan storage:link
+
+Сгенерируй ВСЕ файлы полностью. Каждый контроллер, middleware, service, blade-шаблон — с полным рабочим кодом. Blade-шаблоны должны использовать Tailwind CSS классы и Alpine.js для интерактивности. Это монолитное приложение — всё рендерится на сервере через Blade, Alpine.js только для UI-интерактивности на клиенте (переключение фото, открытие модалок, валидация форм).

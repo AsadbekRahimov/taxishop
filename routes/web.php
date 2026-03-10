@@ -1,22 +1,32 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Shop\CartController;
+use App\Http\Controllers\Shop\CategoryController;
+use App\Http\Controllers\Shop\CheckoutController;
+use App\Http\Controllers\Shop\HomeController;
+use App\Http\Controllers\Shop\ProductController;
+use App\Http\Controllers\Shop\SearchController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SiteController;
 
-// Site routes
-Route::get('/', [SiteController::class, 'index'])->name('home');
-Route::get('/category/{slug?}', [SiteController::class, 'category'])->name('category');
-Route::get('/product/{id?}', [SiteController::class, 'product'])->name('product');
-Route::get('/cart', [SiteController::class, 'cart'])->name('cart');
-Route::get('/checkout', [SiteController::class, 'checkout'])->name('checkout');
-Route::get('/thanks', [SiteController::class, 'thanks'])->name('thanks');
-Route::get('/login', [SiteController::class, 'login'])->name('login');
+// Auth
+Route::get('/auth/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/auth/login', [LoginController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/auth/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Cart AJAX routes
-Route::post('/cart/add', [SiteController::class, 'addToCart'])->name('cart.add');
-Route::post('/cart/remove', [SiteController::class, 'removeFromCart'])->name('cart.remove');
-Route::post('/cart/update', [SiteController::class, 'updateCart'])->name('cart.update');
+// Shop (requires authenticated driver)
+Route::middleware(['auth', 'driver'])->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
+    Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
 
-// Order routes
-Route::post('/order/place', [SiteController::class, 'placeOrder'])->name('order.place');
-Route::get('/order/thanks/{number?}', [SiteController::class, 'orderThanks'])->name('order.thanks');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/order/{number}/thanks', [CheckoutController::class, 'thanks'])->name('order.thanks');
+});
