@@ -1,7 +1,7 @@
 @props(['breadcrumbs' => [], 'current' => ''])
 
 <nav class="flex items-center gap-2 text-sm text-text-muted mb-6">
-    <a href="{{ route('home') }}" class="hover:text-primary transition-colors">Главная</a>
+    <a href="{{ route('home') }}" class="hover:text-primary transition-colors">{{ __('shop.home') }}</a>
 
     @foreach($breadcrumbs as $crumb)
         <i class="fa-solid fa-chevron-right text-xs"></i>

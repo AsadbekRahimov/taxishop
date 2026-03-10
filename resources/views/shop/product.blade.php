@@ -50,15 +50,15 @@
 
             @if($inStock)
                 <span class="inline-block bg-primary text-white text-sm font-bold px-4 py-2 rounded-full mb-4">
-                    <i class="fa-solid fa-bolt mr-2"></i>Есть в машине ({{ $stockQty }} шт.)
+                    <i class="fa-solid fa-bolt mr-2"></i>{{ __('shop.in_car_qty', ['qty' => $stockQty]) }}
                 </span>
             @endif
 
             {{-- Price --}}
             <div class="flex items-baseline gap-3 mb-6">
-                <span class="text-3xl font-extrabold text-primary">{{ number_format((float) $product->price, 0, ',', ' ') }} сум</span>
+                <span class="text-3xl font-extrabold text-primary">{{ number_format((float) $product->price, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
                 @if($product->old_price)
-                    <span class="text-xl text-text-muted line-through">{{ number_format((float) $product->old_price, 0, ',', ' ') }} сум</span>
+                    <span class="text-xl text-text-muted line-through">{{ number_format((float) $product->old_price, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
                     <span class="bg-accent text-white text-sm font-bold px-2 py-1 rounded-lg">
                         -{{ round(($product->old_price - $product->price) / $product->old_price * 100) }}%
                     </span>
@@ -68,7 +68,7 @@
             {{-- Description --}}
             @if($product->description)
                 <div class="bg-bg-color rounded-xl p-5 mb-6">
-                    <h3 class="font-bold text-lg mb-3">О товаре</h3>
+                    <h3 class="font-bold text-lg mb-3">{{ __('shop.about_product') }}</h3>
                     <div class="text-text-muted leading-relaxed prose prose-sm max-w-none">
                         {!! $product->description !!}
                     </div>
@@ -87,7 +87,7 @@
                             {{ !$inStock ? 'disabled' : '' }}
                             class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-light transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
                         <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
-                        <span>Купить у водителя</span>
+                        <span>{{ __('shop.buy_from_driver') }}</span>
                     </button>
                 </form>
 
@@ -100,7 +100,7 @@
                     <button type="submit"
                             class="w-full bg-blue text-white font-bold py-4 px-6 rounded-xl hover:bg-blue/90 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
                         <i class="fa-solid fa-qrcode text-xl"></i>
-                        <span>Оплатить через QR (Paynet)</span>
+                        <span>{{ __('shop.pay_qr') }}</span>
                     </button>
                 </form>
 
@@ -114,7 +114,7 @@
                         <button type="submit"
                                 class="w-full bg-accent text-white font-bold py-4 px-6 rounded-xl hover:bg-accent/90 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
                             <i class="fa-solid fa-truck text-xl"></i>
-                            <span>Заказать на дом</span>
+                            <span>{{ __('shop.order_delivery') }}</span>
                         </button>
                     </form>
                 @endif
@@ -124,7 +124,7 @@
             <div class="mt-6 p-4 bg-blue/10 rounded-xl">
                 <p class="text-sm text-blue flex items-start gap-2">
                     <i class="fa-solid fa-info-circle mt-0.5"></i>
-                    <span>При заказе на дом доставка займет 30-60 минут. Оплата при получении.</span>
+                    <span>{{ __('shop.delivery_note') }}</span>
                 </p>
             </div>
         </div>

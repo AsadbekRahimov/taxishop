@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,14 +70,36 @@
                         <form action="{{ route('search') }}" method="GET" class="flex items-center">
                             <i class="fa-solid fa-search text-text-muted mr-2"></i>
                             <input type="text" name="q" value="{{ request('q') }}"
-                                   placeholder="Поиск товаров..."
+                                   placeholder="{{ __('shop.search_placeholder') }}"
                                    class="bg-transparent py-2 outline-none text-sm w-48">
                         </form>
                     </div>
 
                     <div class="flex items-center gap-4">
+                        {{-- Language Switcher --}}
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open"
+                                    class="bg-bg-color px-3 py-2 rounded-full text-sm font-semibold text-text-muted hover:bg-gray-200 transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-globe"></i>
+                                <span>{{ strtoupper(app()->getLocale()) }}</span>
+                                <i class="fa-solid fa-chevron-down text-xs transition-transform" :class="{ 'rotate-180': open }"></i>
+                            </button>
+                            <div x-show="open" @click.away="open = false" x-transition
+                                 class="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-lg border border-border z-50">
+                                @foreach(['ru' => 'Русский', 'en' => 'English', 'uz' => 'O\'zbek'] as $code => $label)
+                                    <a href="{{ route('locale.switch', $code) }}"
+                                       class="block px-4 py-2.5 text-sm hover:bg-bg-color transition-colors first:rounded-t-xl last:rounded-b-xl {{ app()->getLocale() === $code ? 'bg-bg-color font-bold text-primary' : '' }}">
+                                        {{ $label }}
+                                        @if(app()->getLocale() === $code)
+                                            <i class="fa-solid fa-check text-primary ml-1"></i>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <div class="bg-bg-color px-4 py-2 rounded-full text-sm font-semibold text-text-muted hidden sm:block">
-                            <i class="fa-solid fa-id-badge mr-2"></i> {{ $driverName ?? auth()->user()?->name ?? 'Водитель' }}
+                            <i class="fa-solid fa-id-badge mr-2"></i> {{ $driverName ?? auth()->user()?->name ?? __('shop.driver') }}
                         </div>
 
                         <a href="{{ route('cart.index') }}" class="relative text-primary bg-bg-color w-12 h-12 flex items-center justify-center rounded-full">

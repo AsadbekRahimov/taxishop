@@ -1,13 +1,13 @@
 @extends('layouts.shop')
 
-@section('title', $q ? "Поиск: {$q}" : 'Поиск')
+@section('title', $q ? __('shop.search_results', ['query' => $q]) : __('shop.search'))
 
 @section('content')
     <h1 class="text-3xl font-extrabold mb-6">
         @if($q)
-            Результаты поиска: «{{ $q }}»
+            {{ __('shop.search_results', ['query' => $q]) }}
         @else
-            Поиск товаров
+            {{ __('shop.search_products') }}
         @endif
     </h1>
 
@@ -16,10 +16,10 @@
         <div class="flex gap-3">
             <input type="text" name="q" value="{{ $q }}"
                    class="flex-1 px-5 py-3 border-2 border-border rounded-xl text-lg outline-none transition-colors focus:border-primary bg-white"
-                   placeholder="Введите название товара...">
+                   placeholder="{{ __('shop.search_input_placeholder') }}">
             <button type="submit"
                     class="bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary-light transition-colors">
-                <i class="fa-solid fa-search mr-2"></i> Найти
+                <i class="fa-solid fa-search mr-2"></i> {{ __('shop.find') }}
             </button>
         </div>
     </form>
@@ -33,13 +33,13 @@
                 <i class="fa-solid fa-search text-6xl text-text-muted mb-4"></i>
                 <p class="text-xl text-text-muted mb-2">
                     @if($q)
-                        По запросу «{{ $q }}» ничего не найдено
+                        {{ __('shop.search_not_found', ['query' => $q]) }}
                     @else
-                        Введите запрос для поиска
+                        {{ __('shop.enter_search_query') }}
                     @endif
                 </p>
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2 mt-4 text-primary font-semibold hover:underline">
-                    <i class="fa-solid fa-arrow-left"></i> Вернуться на главную
+                    <i class="fa-solid fa-arrow-left"></i> {{ __('shop.back_to_home') }}
                 </a>
             </div>
         @endforelse

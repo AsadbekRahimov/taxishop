@@ -1,6 +1,6 @@
 @extends('layouts.shop')
 
-@section('title', 'Заказ оформлен')
+@section('title', __('shop.order_confirmed'))
 
 @section('content')
 <div x-data="{ showAnimation: false }"
@@ -20,14 +20,14 @@
         x-show="showAnimation"
         x-transition:enter="transition ease-out duration-500"
         x-transition:enter-delay="100ms">
-        Заказ оформлен!
+        {{ __('shop.order_confirmed') }}
     </h1>
 
     <p class="text-xl text-text-muted mb-8 fade-in-up"
        x-show="showAnimation"
        x-transition:enter="transition ease-out duration-500"
        x-transition:enter-delay="200ms">
-        Спасибо за ваш заказ. Мы уже начали его обработку.
+        {{ __('shop.order_thanks_message') }}
     </p>
 
     {{-- Order Details Card --}}
@@ -38,27 +38,27 @@
 
         <div class="space-y-4">
             <div class="flex justify-between items-center pb-4 border-b border-border">
-                <span class="text-text-muted">Номер заказа:</span>
+                <span class="text-text-muted">{{ __('shop.order_number') }}</span>
                 <span class="font-bold text-lg">{{ $order->order_number }}</span>
             </div>
 
             <div class="flex justify-between items-center pb-4 border-b border-border">
-                <span class="text-text-muted">Клиент:</span>
+                <span class="text-text-muted">{{ __('shop.customer') }}</span>
                 <span class="font-bold">{{ $order->customer_name }}</span>
             </div>
 
             <div class="flex justify-between items-center pb-4 border-b border-border">
-                <span class="text-text-muted">Способ оплаты:</span>
+                <span class="text-text-muted">{{ __('shop.payment_method_label') }}</span>
                 <span class="font-bold flex items-center gap-2">
                     @switch($order->payment_method)
                         @case('cash')
-                            <i class="fa-solid fa-money-bill-wave text-primary"></i> Наличные водителю
+                            <i class="fa-solid fa-money-bill-wave text-primary"></i> {{ __('shop.cash_to_driver') }}
                             @break
                         @case('qr')
-                            <i class="fa-solid fa-qrcode text-blue"></i> QR-код (Paynet)
+                            <i class="fa-solid fa-qrcode text-blue"></i> {{ __('shop.qr_paynet') }}
                             @break
                         @case('delivery')
-                            <i class="fa-solid fa-truck text-accent"></i> Оплата при доставке
+                            <i class="fa-solid fa-truck text-accent"></i> {{ __('shop.payment_on_delivery') }}
                             @break
                     @endswitch
                 </span>
@@ -66,14 +66,14 @@
 
             @if($order->delivery_address)
                 <div class="flex justify-between items-center pb-4 border-b border-border">
-                    <span class="text-text-muted">Адрес доставки:</span>
+                    <span class="text-text-muted">{{ __('shop.delivery_address_label') }}</span>
                     <span class="font-bold text-right max-w-[60%]">{{ $order->delivery_address }}</span>
                 </div>
             @endif
 
             <div class="flex justify-between items-center">
-                <span class="text-text-muted">Сумма заказа:</span>
-                <span class="font-extrabold text-2xl text-primary">{{ number_format((float) $order->total, 0, ',', ' ') }} сум</span>
+                <span class="text-text-muted">{{ __('shop.order_total') }}</span>
+                <span class="font-extrabold text-2xl text-primary">{{ number_format((float) $order->total, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
             </div>
         </div>
     </div>
@@ -83,33 +83,33 @@
          x-show="showAnimation"
          x-transition:enter="transition ease-out duration-500"
          x-transition:enter-delay="400ms">
-        <h3 class="font-bold text-lg mb-3 text-blue">Что дальше?</h3>
+        <h3 class="font-bold text-lg mb-3 text-blue">{{ __('shop.whats_next') }}</h3>
         <div class="space-y-2 text-sm text-blue">
             @switch($order->payment_method)
                 @case('cash')
                     <div class="flex items-start gap-2">
                         <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>Передайте оплату водителю наличными</span>
+                        <span>{{ __('shop.next_cash') }}</span>
                     </div>
                     @break
                 @case('qr')
                     <div class="flex items-start gap-2">
                         <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>Отсканируйте QR-код в приложении для оплаты</span>
+                        <span>{{ __('shop.next_qr_scan') }}</span>
                     </div>
                     <div class="flex items-start gap-2">
                         <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>После оплаты водитель передаст заказ</span>
+                        <span>{{ __('shop.next_qr_after') }}</span>
                     </div>
                     @break
                 @case('delivery')
                     <div class="flex items-start gap-2">
                         <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>Курьер доставит заказ в течение 30-60 минут</span>
+                        <span>{{ __('shop.next_delivery_time') }}</span>
                     </div>
                     <div class="flex items-start gap-2">
                         <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>Оплата при получении заказа</span>
+                        <span>{{ __('shop.next_delivery_pay') }}</span>
                     </div>
                     @break
             @endswitch
@@ -125,11 +125,11 @@
         <a href="{{ route('home') }}"
            class="inline-flex items-center justify-center gap-3 bg-primary text-white font-bold py-4 px-8 rounded-xl hover:bg-primary-light transition-all active:scale-[0.98] text-lg">
             <i class="fa-solid fa-home"></i>
-            Вернуться в каталог
+            {{ __('shop.back_to_catalog') }}
         </a>
 
         <div class="text-sm text-text-muted mt-4">
-            <p>Нужна помощь? Звоните: <a href="tel:+998901234567" class="text-primary font-semibold">+998 90 123-45-67</a></p>
+            <p>{{ __('shop.need_help') }} <a href="tel:+998901234567" class="text-primary font-semibold">+998 90 123-45-67</a></p>
         </div>
     </div>
 </div>

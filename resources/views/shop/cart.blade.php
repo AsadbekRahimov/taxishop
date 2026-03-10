@@ -1,15 +1,15 @@
 @extends('layouts.shop')
 
-@section('title', 'Корзина')
+@section('title', __('shop.cart'))
 
 @section('content')
 <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-extrabold mb-6 flex items-center gap-3">
         <i class="fa-solid fa-shopping-cart text-primary"></i>
-        Корзина
+        {{ __('shop.cart') }}
         @if(count($items) > 0)
             <span class="text-lg font-normal text-text-muted">
-                ({{ count($items) }} {{ count($items) === 1 ? 'товар' : (count($items) < 5 ? 'товара' : 'товаров') }})
+                ({{ count($items) }} {{ count($items) === 1 ? __('shop.item_one') : (count($items) < 5 ? __('shop.item_few') : __('shop.item_many')) }})
             </span>
         @endif
     </h1>
@@ -33,9 +33,9 @@
                                 <h3 class="font-bold text-lg mb-1">{{ $item['product']->name }}</h3>
                             </a>
                             <div class="flex items-baseline gap-2">
-                                <span class="text-primary font-bold">{{ number_format((float) $item['product']->price, 0, ',', ' ') }} сум</span>
+                                <span class="text-primary font-bold">{{ number_format((float) $item['product']->price, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
                                 @if($item['product']->old_price)
-                                    <span class="text-sm text-text-muted line-through">{{ number_format((float) $item['product']->old_price, 0, ',', ' ') }} сум</span>
+                                    <span class="text-sm text-text-muted line-through">{{ number_format((float) $item['product']->old_price, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -78,7 +78,7 @@
 
                         {{-- Item Total --}}
                         <div class="text-right min-w-[100px]">
-                            <div class="text-lg font-bold text-primary">{{ number_format($item['subtotal'], 0, ',', ' ') }} сум</div>
+                            <div class="text-lg font-bold text-primary">{{ number_format($item['subtotal'], 0, ',', ' ') }} {{ __('shop.currency') }}</div>
                         </div>
 
                         {{-- Remove Button --}}
@@ -98,28 +98,28 @@
         {{-- Cart Summary --}}
         <div class="bg-white rounded-2xl p-6 shadow-sm sticky bottom-5">
             <div class="flex justify-between items-center mb-6">
-                <span class="text-xl text-text-muted">Итого:</span>
-                <span class="text-3xl font-extrabold text-primary">{{ number_format($total, 0, ',', ' ') }} сум</span>
+                <span class="text-xl text-text-muted">{{ __('shop.total') }}</span>
+                <span class="text-3xl font-extrabold text-primary">{{ number_format($total, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
             </div>
 
             <div class="space-y-3">
                 <a href="{{ route('checkout.show') }}"
                    class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-light transition-all active:scale-[0.98] flex items-center justify-center gap-3 text-lg">
                     <i class="fa-solid fa-credit-card"></i>
-                    Оформить заказ
+                    {{ __('shop.checkout') }}
                 </a>
 
                 <a href="{{ route('home') }}"
                    class="w-full border-2 border-border bg-white text-text-main font-bold py-4 px-6 rounded-xl hover:border-primary transition-all flex items-center justify-center gap-3">
                     <i class="fa-solid fa-arrow-left"></i>
-                    Продолжить покупки
+                    {{ __('shop.continue_shopping') }}
                 </a>
             </div>
 
             <div class="mt-4 p-3 bg-bg-color rounded-xl">
                 <p class="text-sm text-text-muted text-center">
                     <i class="fa-solid fa-truck mr-2"></i>
-                    Доставка 30-60 минут при заказе на дом
+                    {{ __('shop.delivery_time_note') }}
                 </p>
             </div>
         </div>
@@ -128,10 +128,10 @@
         {{-- Empty Cart --}}
         <div class="text-center py-20">
             <i class="fa-solid fa-shopping-cart text-6xl text-text-muted mb-4"></i>
-            <p class="text-xl text-text-muted mb-6">Корзина пуста</p>
+            <p class="text-xl text-text-muted mb-6">{{ __('shop.cart_empty') }}</p>
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-xl hover:bg-primary-light transition-colors">
                 <i class="fa-solid fa-arrow-left"></i>
-                Вернуться к покупкам
+                {{ __('shop.back_to_shopping') }}
             </a>
         </div>
     @endif

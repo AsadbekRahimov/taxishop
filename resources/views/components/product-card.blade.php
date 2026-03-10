@@ -3,7 +3,7 @@
 <div class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all hover:scale-105 active:scale-95 relative">
     @if($inStock)
         <span class="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full z-10">
-            В машине
+            {{ __('shop.in_car_badge') }}
         </span>
     @endif
 
@@ -25,9 +25,9 @@
     </a>
 
     <div class="mb-3">
-        <span class="text-xl font-extrabold text-primary">{{ number_format((float) $product->price, 0, ',', ' ') }} сум</span>
+        <span class="text-xl font-extrabold text-primary">{{ number_format((float) $product->price, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
         @if($product->old_price)
-            <span class="text-sm text-text-muted line-through ml-2">{{ number_format((float) $product->old_price, 0, ',', ' ') }} сум</span>
+            <span class="text-sm text-text-muted line-through ml-2">{{ number_format((float) $product->old_price, 0, ',', ' ') }} {{ __('shop.currency') }}</span>
         @endif
     </div>
 
@@ -38,7 +38,7 @@
         <button type="submit"
                 class="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-primary-light transition-colors active:scale-95"
                 @click="cartCount++">
-            <i class="fa-solid fa-cart-plus mr-2"></i> В корзину
+            <i class="fa-solid fa-cart-plus mr-2"></i> {{ __('shop.add_to_cart') }}
         </button>
     </form>
 </div>

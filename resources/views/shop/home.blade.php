@@ -1,6 +1,6 @@
 @extends('layouts.shop')
 
-@section('title', 'Главная')
+@section('title', __('shop.home'))
 
 @section('content')
 <div x-data="{
@@ -46,7 +46,7 @@
     @if($categories->isNotEmpty())
     <section class="mb-8">
         <h2 class="text-2xl font-extrabold mb-5 flex items-center gap-2.5">
-            <i class="fa-solid fa-th-large text-primary"></i> Категории
+            <i class="fa-solid fa-th-large text-primary"></i> {{ __('shop.categories') }}
         </h2>
         <div class="grid grid-cols-3 md:grid-cols-4 gap-4">
             @foreach($categories as $category)
@@ -60,7 +60,7 @@
                         @endif
                     </div>
                     <div class="font-semibold text-sm">{{ $category->name }}</div>
-                    <div class="text-xs text-text-muted mt-1">{{ $category->products_count ?? $category->products()->count() }} товаров</div>
+                    <div class="text-xs text-text-muted mt-1">{{ __('shop.products_count', ['count' => $category->products_count ?? $category->products()->count()]) }}</div>
                 </a>
 
                 @foreach($category->children as $child)
@@ -74,7 +74,7 @@
                             @endif
                         </div>
                         <div class="font-semibold text-sm">{{ $child->name }}</div>
-                        <div class="text-xs text-text-muted mt-1">{{ $child->products_count ?? $child->products()->count() }} товаров</div>
+                        <div class="text-xs text-text-muted mt-1">{{ __('shop.products_count', ['count' => $child->products_count ?? $child->products()->count()]) }}</div>
                     </a>
                 @endforeach
             @endforeach
@@ -86,7 +86,7 @@
     @if($inStockProducts->isNotEmpty())
     <section class="mb-8">
         <h2 class="text-2xl font-extrabold mb-5 flex items-center gap-2.5">
-            <i class="fa-solid fa-bolt text-accent"></i> Есть в машине
+            <i class="fa-solid fa-bolt text-accent"></i> {{ __('shop.in_car') }}
         </h2>
         <div class="relative">
             <div class="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide pb-4" style="scroll-snap-type: x mandatory;">
@@ -103,7 +103,7 @@
     {{-- Bestsellers --}}
     <section class="mb-8">
         <h2 class="text-2xl font-extrabold mb-5 flex items-center gap-2.5">
-            <i class="fa-solid fa-fire text-accent"></i> Хиты продаж
+            <i class="fa-solid fa-fire text-accent"></i> {{ __('shop.bestsellers') }}
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @forelse($hits as $product)
@@ -111,7 +111,7 @@
             @empty
                 <div class="col-span-full text-center py-12 text-text-muted">
                     <i class="fa-solid fa-box-open text-4xl mb-3"></i>
-                    <p>Товары пока не добавлены</p>
+                    <p>{{ __('shop.no_products_yet') }}</p>
                 </div>
             @endforelse
         </div>
