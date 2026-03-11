@@ -20,12 +20,13 @@ class OrderService
             }
 
             $order = Order::create([
+                'order_type' => $data['order_type'] ?? 'pickup',
                 'driver_id' => $driverId,
-                'customer_name' => $data['customer_name'],
-                'customer_phone' => $data['customer_phone'],
+                'customer_name' => $data['customer_name'] ?? null,
+                'customer_phone' => $data['customer_phone'] ?? null,
                 'delivery_address' => $data['delivery_address'] ?? null,
                 'payment_method' => $data['payment_method'],
-                'status' => 'new',
+                'status' => 'pending',
                 'total' => $total,
             ]);
 
@@ -37,13 +38,34 @@ class OrderService
                     'price' => $item['product']->price,
                     'subtotal' => $item['subtotal'],
                 ]);
-
-                if ($data['payment_method'] === 'cash') {
-                    $this->decrementDriverStock($driverId, $item['product']->id, $item['qty']);
-                }
             }
 
             return $order;
+        });
+    }
+
+    public function confirmOrder(Order $order): void
+    {
+        DB::transaction(function () use ($order) {
+            if ($order->isPickup()) {
+                foreach ($order->items as $item) {
+                    $this->decrementDriverStock($order->driver_id, $item->product_id, $item->quantity);
+                }
+            }
+
+            $order->update(['status' => 'confirmed']);
+        });
+    }
+
+    public function cancelOrder(Order $order): void
+    {
+        $order->update(['status' => 'cancelled']);
+    }
+
+    public function markDelivered(Order $order): void
+    {
+        DB::transaction(function () use ($order) {
+            $order->update(['status' => 'delivered']);
         });
     }
 

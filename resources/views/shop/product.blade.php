@@ -77,54 +77,45 @@
 
             {{-- Action Buttons --}}
             <div class="space-y-3">
-                {{-- Buy from Driver (cash) --}}
-                <form action="{{ route('cart.add') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <input type="hidden" name="qty" value="1">
-                    <input type="hidden" name="payment_method" value="cash">
-                    <button type="submit"
-                            {{ !$inStock ? 'disabled' : '' }}
-                            class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-light transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
-                        <span>{{ __('shop.buy_from_driver') }}</span>
-                    </button>
-                </form>
-
-                {{-- Pay with QR --}}
-                <form action="{{ route('cart.add') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <input type="hidden" name="qty" value="1">
-                    <input type="hidden" name="payment_method" value="qr">
-                    <button type="submit"
-                            class="w-full bg-blue text-white font-bold py-4 px-6 rounded-xl hover:bg-blue/90 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-qrcode text-xl"></i>
-                        <span>{{ __('shop.pay_qr') }}</span>
-                    </button>
-                </form>
-
-                {{-- Order to Home (delivery) --}}
-                @if($product->is_deliverable)
+                {{-- Buy on the spot (pickup) - only if in stock --}}
+                @if($inStock)
                     <form action="{{ route('cart.add') }}" method="POST">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="qty" value="1">
-                        <input type="hidden" name="payment_method" value="delivery">
+                        <input type="hidden" name="order_type" value="pickup">
                         <button type="submit"
-                                class="w-full bg-accent text-white font-bold py-4 px-6 rounded-xl hover:bg-accent/90 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
-                            <i class="fa-solid fa-truck text-xl"></i>
-                            <span>{{ __('shop.order_delivery') }}</span>
+                                class="w-full bg-primary text-white font-bold py-4 px-6 rounded-xl hover:bg-primary-light transition-all active:scale-[0.98] flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                            <span>{{ __('shop.buy_on_spot') }}</span>
                         </button>
                     </form>
+                @else
+                    <div class="w-full bg-gray-200 text-text-muted font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 cursor-not-allowed">
+                        <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                        <span>{{ __('shop.not_in_car') }}</span>
+                    </div>
                 @endif
+
+                {{-- Order delivery --}}
+                <form action="{{ route('cart.add') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <input type="hidden" name="qty" value="1">
+                    <input type="hidden" name="order_type" value="delivery">
+                    <button type="submit"
+                            class="w-full bg-accent text-white font-bold py-4 px-6 rounded-xl hover:bg-accent/90 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-truck text-xl"></i>
+                        <span>{{ __('shop.order_delivery') }}</span>
+                    </button>
+                </form>
             </div>
 
             {{-- Info Note --}}
             <div class="mt-6 p-4 bg-blue/10 rounded-xl">
                 <p class="text-sm text-blue flex items-start gap-2">
                     <i class="fa-solid fa-info-circle mt-0.5"></i>
-                    <span>{{ __('shop.delivery_note') }}</span>
+                    <span>{{ __('shop.driver_confirmation_note') }}</span>
                 </p>
             </div>
         </div>

@@ -47,14 +47,30 @@ class OrderResource extends Resource
                         Infolists\Components\TextEntry::make('order_number')
                             ->label('Номер заказа'),
 
+                        Infolists\Components\TextEntry::make('order_type')
+                            ->label('Тип заказа')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'pickup' => 'success',
+                                'delivery' => 'warning',
+                                default => 'gray',
+                            })
+                            ->formatStateUsing(fn (string $state): string => match ($state) {
+                                'pickup' => 'На месте',
+                                'delivery' => 'Доставка',
+                                default => $state,
+                            }),
+
                         Infolists\Components\TextEntry::make('driver.name')
                             ->label('Водитель'),
 
                         Infolists\Components\TextEntry::make('customer_name')
-                            ->label('Имя клиента'),
+                            ->label('Имя клиента')
+                            ->placeholder('—'),
 
                         Infolists\Components\TextEntry::make('customer_phone')
-                            ->label('Телефон клиента'),
+                            ->label('Телефон клиента')
+                            ->placeholder('—'),
 
                         Infolists\Components\TextEntry::make('delivery_address')
                             ->label('Адрес доставки')
@@ -73,7 +89,7 @@ class OrderResource extends Resource
                             ->formatStateUsing(fn (string $state): string => match ($state) {
                                 'cash' => 'Наличные',
                                 'qr' => 'QR-код',
-                                'delivery' => 'При доставке',
+                                'delivery' => 'При получении',
                                 default => $state,
                             }),
 
@@ -81,15 +97,15 @@ class OrderResource extends Resource
                             ->label('Статус')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
-                                'new' => 'gray',
-                                'paid' => 'success',
+                                'pending' => 'warning',
+                                'confirmed' => 'success',
                                 'delivered' => 'primary',
                                 'cancelled' => 'danger',
                                 default => 'gray',
                             })
                             ->formatStateUsing(fn (string $state): string => match ($state) {
-                                'new' => 'Новый',
-                                'paid' => 'Оплачен',
+                                'pending' => 'Ожидает подтверждения',
+                                'confirmed' => 'Подтверждён',
                                 'delivered' => 'Доставлен',
                                 'cancelled' => 'Отменён',
                                 default => $state,
@@ -97,7 +113,7 @@ class OrderResource extends Resource
 
                         Infolists\Components\TextEntry::make('total')
                             ->label('Сумма')
-                            ->money('RUB'),
+                            ->money('UZS'),
 
                         Infolists\Components\TextEntry::make('created_at')
                             ->label('Дата создания')
@@ -118,11 +134,11 @@ class OrderResource extends Resource
 
                                 Infolists\Components\TextEntry::make('price')
                                     ->label('Цена')
-                                    ->money('RUB'),
+                                    ->money('UZS'),
 
                                 Infolists\Components\TextEntry::make('subtotal')
                                     ->label('Сумма')
-                                    ->money('RUB'),
+                                    ->money('UZS'),
                             ])
                             ->columns(4),
                     ]),
@@ -138,14 +154,30 @@ class OrderResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('order_type')
+                    ->label('Тип')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pickup' => 'success',
+                        'delivery' => 'warning',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pickup' => 'На месте',
+                        'delivery' => 'Доставка',
+                        default => $state,
+                    }),
+
                 Tables\Columns\TextColumn::make('customer_name')
                     ->label('Клиент')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('—'),
 
                 Tables\Columns\TextColumn::make('customer_phone')
                     ->label('Телефон')
-                    ->searchable(),
+                    ->searchable()
+                    ->placeholder('—'),
 
                 Tables\Columns\TextColumn::make('driver.name')
                     ->label('Водитель')
@@ -164,7 +196,7 @@ class OrderResource extends Resource
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'cash' => 'Наличные',
                         'qr' => 'QR-код',
-                        'delivery' => 'При доставке',
+                        'delivery' => 'При получении',
                         default => $state,
                     }),
 
@@ -172,15 +204,15 @@ class OrderResource extends Resource
                     ->label('Статус')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'new' => 'gray',
-                        'paid' => 'success',
+                        'pending' => 'warning',
+                        'confirmed' => 'success',
                         'delivered' => 'primary',
                         'cancelled' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'new' => 'Новый',
-                        'paid' => 'Оплачен',
+                        'pending' => 'Ожидает',
+                        'confirmed' => 'Подтверждён',
                         'delivered' => 'Доставлен',
                         'cancelled' => 'Отменён',
                         default => $state,
@@ -188,7 +220,7 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('total')
                     ->label('Сумма')
-                    ->money('RUB')
+                    ->money('UZS')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -198,11 +230,18 @@ class OrderResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('order_type')
+                    ->label('Тип заказа')
+                    ->options([
+                        'pickup' => 'На месте',
+                        'delivery' => 'Доставка',
+                    ]),
+
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Статус')
                     ->options([
-                        'new' => 'Новый',
-                        'paid' => 'Оплачен',
+                        'pending' => 'Ожидает подтверждения',
+                        'confirmed' => 'Подтверждён',
                         'delivered' => 'Доставлен',
                         'cancelled' => 'Отменён',
                     ]),
@@ -212,7 +251,7 @@ class OrderResource extends Resource
                     ->options([
                         'cash' => 'Наличные',
                         'qr' => 'QR-код',
-                        'delivery' => 'При доставке',
+                        'delivery' => 'При получении',
                     ]),
 
                 Tables\Filters\SelectFilter::make('driver_id')
@@ -243,8 +282,8 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('status')
                             ->label('Новый статус')
                             ->options([
-                                'new' => 'Новый',
-                                'paid' => 'Оплачен',
+                                'pending' => 'Ожидает подтверждения',
+                                'confirmed' => 'Подтверждён',
                                 'delivered' => 'Доставлен',
                                 'cancelled' => 'Отменён',
                             ])
@@ -261,8 +300,8 @@ class OrderResource extends Resource
                             Forms\Components\Select::make('status')
                                 ->label('Новый статус')
                                 ->options([
-                                    'new' => 'Новый',
-                                    'paid' => 'Оплачен',
+                                    'pending' => 'Ожидает подтверждения',
+                                    'confirmed' => 'Подтверждён',
                                     'delivered' => 'Доставлен',
                                     'cancelled' => 'Отменён',
                                 ])

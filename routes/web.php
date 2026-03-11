@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Driver\OrderController as DriverOrderController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Shop\CartController;
 use App\Http\Controllers\Shop\CategoryController;
@@ -33,4 +34,9 @@ Route::middleware(['auth', 'driver'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/order/{number}/thanks', [CheckoutController::class, 'thanks'])->name('order.thanks');
+
+    // Driver panel (for driver's phone — confirm/cancel orders)
+    Route::get('/driver/orders', [DriverOrderController::class, 'index'])->name('driver.orders');
+    Route::post('/driver/orders/{order}/confirm', [DriverOrderController::class, 'confirm'])->name('driver.orders.confirm');
+    Route::post('/driver/orders/{order}/cancel', [DriverOrderController::class, 'cancel'])->name('driver.orders.cancel');
 });
