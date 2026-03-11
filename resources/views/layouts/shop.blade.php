@@ -102,6 +102,11 @@
                             <i class="fa-solid fa-id-badge mr-2"></i> {{ $driverName ?? auth()->user()?->name ?? __('shop.driver') }}
                         </div>
 
+                        {{-- Driver Orders Panel --}}
+                        <a href="{{ route('driver.orders') }}" class="relative text-amber-600 bg-bg-color w-12 h-12 flex items-center justify-center rounded-full hover:bg-amber-50 transition-colors" title="{{ __('shop.driver_orders') }}">
+                            <i class="fa-solid fa-clipboard-list text-xl"></i>
+                        </a>
+
                         <a href="{{ route('cart.index') }}" class="relative text-primary bg-bg-color w-12 h-12 flex items-center justify-center rounded-full">
                             <i class="fa-solid fa-shopping-cart text-xl"></i>
                             <template x-if="cartCount > 0">

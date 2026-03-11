@@ -12,6 +12,7 @@ class Order extends Model
 {
     protected $fillable = [
         'order_number',
+        'order_type',
         'driver_id',
         'customer_name',
         'customer_phone',
@@ -24,6 +25,21 @@ class Order extends Model
     protected $casts = [
         'total' => 'decimal:2',
     ];
+
+    public function isPickup(): bool
+    {
+        return $this->order_type === 'pickup';
+    }
+
+    public function isDelivery(): bool
+    {
+        return $this->order_type === 'delivery';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
 
     protected static function booted(): void
     {

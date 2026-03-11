@@ -32,6 +32,7 @@ class CartController extends Controller
             'product_id' => ['required', 'exists:products,id'],
             'qty' => ['integer', 'min:1'],
             'payment_method' => ['nullable', 'in:cash,qr,delivery'],
+            'order_type' => ['nullable', 'in:pickup,delivery'],
         ]);
 
         $this->cartService->addItem(
@@ -40,11 +41,9 @@ class CartController extends Controller
             $validated['payment_method'] ?? null,
         );
 
-        if (! empty($validated['payment_method'])) {
-            return redirect()->route('checkout.show');
-        }
+        $orderType = $validated['order_type'] ?? 'pickup';
 
-        return redirect()->route('cart.index');
+        return redirect()->route('checkout.show', ['type' => $orderType]);
     }
 
     public function update(Request $request): RedirectResponse

@@ -1,6 +1,6 @@
 @extends('layouts.shop')
 
-@section('title', __('shop.order_confirmed'))
+@section('title', __('shop.order_created'))
 
 @section('content')
 <div x-data="{ showAnimation: false }"
@@ -9,10 +9,8 @@
 
     {{-- Success Animation --}}
     <div class="mb-8 fade-in-up" x-show="showAnimation" x-transition:enter="transition ease-out duration-500">
-        <div class="w-32 h-32 mx-auto bg-green-100 rounded-full flex items-center justify-center">
-            <svg class="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path class="checkmark-animate" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-            </svg>
+        <div class="w-32 h-32 mx-auto bg-amber-100 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-clock text-amber-500 text-5xl"></i>
         </div>
     </div>
 
@@ -20,14 +18,14 @@
         x-show="showAnimation"
         x-transition:enter="transition ease-out duration-500"
         x-transition:enter-delay="100ms">
-        {{ __('shop.order_confirmed') }}
+        {{ __('shop.order_created') }}
     </h1>
 
     <p class="text-xl text-text-muted mb-8 fade-in-up"
        x-show="showAnimation"
        x-transition:enter="transition ease-out duration-500"
        x-transition:enter-delay="200ms">
-        {{ __('shop.order_thanks_message') }}
+        {{ __('shop.order_waiting_confirmation') }}
     </p>
 
     {{-- Order Details Card --}}
@@ -43,22 +41,36 @@
             </div>
 
             <div class="flex justify-between items-center pb-4 border-b border-border">
-                <span class="text-text-muted">{{ __('shop.customer') }}</span>
-                <span class="font-bold">{{ $order->customer_name }}</span>
+                <span class="text-text-muted">{{ __('shop.order_type_label') }}</span>
+                <span class="font-bold flex items-center gap-2">
+                    @if($order->isPickup())
+                        <i class="fa-solid fa-hand-holding-dollar text-primary"></i> {{ __('shop.pickup_on_spot') }}
+                    @else
+                        <i class="fa-solid fa-truck text-accent"></i> {{ __('shop.delivery_to_home') }}
+                    @endif
+                </span>
             </div>
+
+            @if($order->customer_name)
+                <div class="flex justify-between items-center pb-4 border-b border-border">
+                    <span class="text-text-muted">{{ __('shop.customer') }}</span>
+                    <span class="font-bold">{{ $order->customer_name }}</span>
+                </div>
+            @endif
 
             <div class="flex justify-between items-center pb-4 border-b border-border">
                 <span class="text-text-muted">{{ __('shop.payment_method_label') }}</span>
                 <span class="font-bold flex items-center gap-2">
                     @switch($order->payment_method)
                         @case('cash')
-                            <i class="fa-solid fa-money-bill-wave text-primary"></i> {{ __('shop.cash_to_driver') }}
+                            <i class="fa-solid fa-money-bill-wave text-primary"></i> {{ __('shop.cash_payment') }}
                             @break
                         @case('qr')
                             <i class="fa-solid fa-qrcode text-blue"></i> {{ __('shop.qr_paynet') }}
                             @break
                         @case('delivery')
-                            <i class="fa-solid fa-truck text-accent"></i> {{ __('shop.payment_on_delivery') }}
+                            <i class="fa-solid fa-clock text-accent"></i>
+                            {{ $order->isPickup() ? __('shop.pay_on_receipt') : __('shop.pay_on_delivery') }}
                             @break
                     @endswitch
                 </span>
@@ -78,42 +90,22 @@
         </div>
     </div>
 
-    {{-- Next Steps --}}
-    <div class="bg-blue/10 rounded-2xl p-6 mb-8 fade-in-up text-left"
+    {{-- Waiting for confirmation --}}
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 fade-in-up"
          x-show="showAnimation"
          x-transition:enter="transition ease-out duration-500"
          x-transition:enter-delay="400ms">
-        <h3 class="font-bold text-lg mb-3 text-blue">{{ __('shop.whats_next') }}</h3>
-        <div class="space-y-2 text-sm text-blue">
-            @switch($order->payment_method)
-                @case('cash')
-                    <div class="flex items-start gap-2">
-                        <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>{{ __('shop.next_cash') }}</span>
-                    </div>
-                    @break
-                @case('qr')
-                    <div class="flex items-start gap-2">
-                        <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>{{ __('shop.next_qr_scan') }}</span>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>{{ __('shop.next_qr_after') }}</span>
-                    </div>
-                    @break
-                @case('delivery')
-                    <div class="flex items-start gap-2">
-                        <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>{{ __('shop.next_delivery_time') }}</span>
-                    </div>
-                    <div class="flex items-start gap-2">
-                        <i class="fa-solid fa-check-circle mt-0.5"></i>
-                        <span>{{ __('shop.next_delivery_pay') }}</span>
-                    </div>
-                    @break
-            @endswitch
+        <div class="flex items-center justify-center gap-3 mb-3">
+            <div class="animate-spin w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full"></div>
+            <h3 class="font-bold text-lg text-amber-700">{{ __('shop.waiting_driver_title') }}</h3>
         </div>
+        <p class="text-sm text-amber-600">
+            @if($order->isPickup())
+                {{ __('shop.waiting_driver_pickup') }}
+            @else
+                {{ __('shop.waiting_driver_delivery') }}
+            @endif
+        </p>
     </div>
 
     {{-- Actions --}}
