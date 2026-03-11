@@ -22,6 +22,8 @@ Route::post('/auth/logout', [LoginController::class, 'logout'])->name('logout');
 // Shop (requires authenticated driver)
 Route::middleware(['auth', 'driver'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/in-car', [HomeController::class, 'inCar'])->name('products.in-car');
+    Route::get('/delivery', [HomeController::class, 'delivery'])->name('products.delivery');
     Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
     Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
     Route::get('/search', [SearchController::class, 'search'])->name('search');
