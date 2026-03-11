@@ -106,6 +106,7 @@ return [
     'need_help' => 'Yordam kerakmi? Qo\'ng\'iroq qiling:',
 
     // Driver panel
+    'driver_panel' => 'Haydovchi kabineti',
     'driver_orders' => 'Mening buyurtmalarim',
     'pending_orders' => 'Kutilayotgan',
     'order_history' => 'Tarix',

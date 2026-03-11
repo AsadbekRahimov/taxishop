@@ -1,12 +1,13 @@
-@extends('layouts.shop')
+@extends('layouts.driver')
 
 @section('title', __('shop.driver_orders'))
 
 @section('content')
-<div class="max-w-2xl mx-auto" x-data="{ tab: 'pending' }">
-    <h1 class="text-2xl font-extrabold mb-6 flex items-center gap-3">
+<div x-data="{ tab: 'pending' }">
+    <h1 class="text-xl font-extrabold mb-4 flex items-center gap-2">
         <i class="fa-solid fa-clipboard-list text-primary"></i>
         {{ __('shop.driver_orders') }}
+        <span class="text-sm font-normal text-text-muted">({{ auth()->user()?->car_number }})</span>
     </h1>
 
     {{-- Tabs --}}

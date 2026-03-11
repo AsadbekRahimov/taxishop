@@ -12,6 +12,12 @@
 - **БД:** SQLite (настраиваемо)
 - **Сборка:** Vite 7
 
+### Три интерфейса
+
+1. **Магазин** (планшет на заднем сиденье) — клиент просматривает и заказывает товары
+2. **Кабинет водителя** (`/driver/orders`, смартфон водителя) — подтверждение/отклонение заказов
+3. **Админ-панель** (`/admin`) — управление каталогом, водителями, заказами
+
 ---
 
 ## Структура директорий
@@ -24,19 +30,21 @@ taxishop/
 │   │   ├── Resources/            # CRUD-ресурсы админки
 │   │   │   ├── CategoryResource/ # Управление категориями
 │   │   │   ├── DriverResource/   # Управление водителями + их стоком
-│   │   │   ├── OrderResource/    # Просмотр и управление заказами
+│   │   │   ├── OrderResource/    # Просмотр и управление заказами (с фильтром по типу)
 │   │   │   └── ProductResource/  # Управление товарами
 │   │   └── Widgets/              # Виджеты дашборда (статистика, графики)
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Auth/
 │   │   │   │   └── LoginController.php      # Логин водителей (по полю login)
+│   │   │   ├── Driver/
+│   │   │   │   └── OrderController.php      # Кабинет водителя: подтверждение/отклонение заказов
 │   │   │   ├── Shop/
 │   │   │   │   ├── HomeController.php        # Главная: категории + бестселлеры
 │   │   │   │   ├── ProductController.php     # Страница товара + breadcrumbs
 │   │   │   │   ├── CategoryController.php    # Список товаров в категории + сортировка
 │   │   │   │   ├── CartController.php        # Добавление/обновление/удаление корзины
-│   │   │   │   ├── CheckoutController.php    # Оформление заказа + страница thanks
+│   │   │   │   ├── CheckoutController.php    # Оформление заказа (pickup/delivery) + thanks
 │   │   │   │   └── SearchController.php      # Поиск товаров по названию
 │   │   │   ├── LocaleController.php          # Переключение языка (ru/en/uz)
 │   │   │   └── SiteController.php            # Legacy контроллер (не используется)
@@ -48,13 +56,13 @@ taxishop/
 │   │   ├── User.php              # Пользователь (login, role, car_number, is_active)
 │   │   ├── Product.php           # Товар (name, slug, price, old_price, main_image)
 │   │   ├── Category.php          # Категория (name, slug, parent_id, icon, sort_order)
-│   │   ├── Order.php             # Заказ (order_number, status, payment_method, total)
+│   │   ├── Order.php             # Заказ (order_number, order_type, status, payment_method, total)
 │   │   ├── OrderItem.php         # Позиция заказа (product_id, quantity, price, subtotal)
 │   │   ├── DriverStock.php       # Сток водителя (driver_id, product_id, quantity)
 │   │   └── ProductImage.php      # Доп. изображения товара (image_path, sort_order)
 │   ├── Services/
 │   │   ├── CartService.php       # Логика корзины (сессионная, add/update/remove/total)
-│   │   ├── OrderService.php      # Создание заказа + декремент стока (транзакция)
+│   │   ├── OrderService.php      # Создание заказа, подтверждение, отмена, декремент стока
 │   │   └── SiteService.php       # Legacy (захардкоженные данные, не используется)
 │   └── Providers/
 │       ├── AppServiceProvider.php
@@ -75,7 +83,8 @@ taxishop/
 │   │   ├── ..._create_product_images_table.php        # Доп. изображения
 │   │   ├── ..._create_driver_stock_table.php          # Сток водителей
 │   │   ├── ..._create_orders_table.php                # Заказы
-│   │   └── ..._create_order_items_table.php           # Позиции заказов
+│   │   ├── ..._create_order_items_table.php           # Позиции заказов
+│   │   └── ..._add_order_type_to_orders_table.php     # Добавление order_type, nullable customer fields
 │   ├── factories/                # Фабрики моделей для тестов
 │   └── seeders/
 │       └── DatabaseSeeder.php    # Сидер с тестовыми данными
@@ -83,17 +92,20 @@ taxishop/
 ├── resources/
 │   ├── views/
 │   │   ├── layouts/
-│   │   │   ├── shop.blade.php    # Основной layout (header, footer, cart badge, lang switcher)
+│   │   │   ├── shop.blade.php    # Layout магазина (планшет клиента: header, footer, cart, search)
+│   │   │   ├── driver.blade.php  # Layout кабинета водителя (смартфон: зелёная шапка, без магазина)
 │   │   │   ├── auth.blade.php    # Layout для страницы входа
 │   │   │   └── site.blade.php    # Legacy layout
-│   │   ├── shop/
+│   │   ├── shop/                 # Страницы магазина (планшет клиента)
 │   │   │   ├── home.blade.php    # Главная: баннер-карусель, категории, бестселлеры
-│   │   │   ├── product.blade.php # Детальная страница товара
+│   │   │   ├── product.blade.php # Детальная страница товара (кнопки: купить на месте / доставка)
 │   │   │   ├── category.blade.php# Товары в категории + сортировка
 │   │   │   ├── cart.blade.php    # Корзина с управлением количеством
-│   │   │   ├── checkout.blade.php# Форма оформления заказа
+│   │   │   ├── checkout.blade.php# Оформление заказа (вкладки: pickup / delivery)
 │   │   │   ├── search.blade.php  # Результаты поиска
-│   │   │   └── thanks.blade.php  # Подтверждение заказа
+│   │   │   └── thanks.blade.php  # Ожидание подтверждения водителем
+│   │   ├── driver/               # Страницы кабинета водителя (смартфон)
+│   │   │   └── orders.blade.php  # Список заказов: ожидающие + история (подтвердить/отклонить)
 │   │   ├── auth/
 │   │   │   └── login.blade.php   # Форма входа для водителей
 │   │   └── components/
@@ -109,7 +121,7 @@ taxishop/
 │       └── bootstrap.js          # Инициализация axios
 │
 ├── routes/
-│   ├── web.php                   # ВСЕ маршруты (auth, shop, cart, checkout)
+│   ├── web.php                   # ВСЕ маршруты (auth, shop, cart, checkout, driver panel)
 │   └── console.php               # Консольные команды
 │
 ├── lang/                         # Переводы
@@ -197,12 +209,13 @@ taxishop/
 |------|-----|----------|
 | id | bigint PK | |
 | order_number | string unique | Номер заказа (TS-######) |
-| driver_id | bigint FK→users (restrict) | Водитель, оформивший заказ |
-| customer_name | string | Имя покупателя |
-| customer_phone | string | Телефон покупателя (+998...) |
-| delivery_address | string nullable | Адрес доставки |
+| **order_type** | string default:pickup | Тип: `pickup` (на месте) или `delivery` (доставка) |
+| driver_id | bigint FK→users (restrict) | Водитель |
+| customer_name | string **nullable** | Имя покупателя (только для delivery) |
+| customer_phone | string **nullable** | Телефон покупателя (только для delivery) |
+| delivery_address | string nullable | Адрес доставки (только для delivery) |
 | payment_method | enum(cash, qr, delivery) | Способ оплаты |
-| status | enum(new, paid, delivered, cancelled) default:new | Статус |
+| status | string default:pending | `pending` → `confirmed` → `delivered` / `cancelled` |
 | total | decimal(10,2) | Итоговая сумма |
 
 ### order_items
@@ -231,7 +244,7 @@ taxishop/
 |-------|-----|-----------|--------------|
 | GET | /locale/{locale} | LocaleController@switch | locale.switch |
 
-### Магазин (требует auth + роль driver/admin)
+### Магазин — планшет клиента (требует auth + роль driver/admin)
 | Метод | URL | Контроллер | Имя маршрута |
 |-------|-----|-----------|--------------|
 | GET | / | HomeController@index | home |
@@ -250,9 +263,16 @@ taxishop/
 ### Оформление заказа
 | Метод | URL | Контроллер | Имя маршрута |
 |-------|-----|-----------|--------------|
-| GET | /checkout | CheckoutController@show | checkout.show |
+| GET | /checkout?type=pickup\|delivery | CheckoutController@show | checkout.show |
 | POST | /checkout | CheckoutController@store | checkout.store |
 | GET | /order/{number}/thanks | CheckoutController@thanks | order.thanks |
+
+### Кабинет водителя — смартфон водителя
+| Метод | URL | Контроллер | Имя маршрута |
+|-------|-----|-----------|--------------|
+| GET | /driver/orders | Driver\OrderController@index | driver.orders |
+| POST | /driver/orders/{order}/confirm | Driver\OrderController@confirm | driver.orders.confirm |
+| POST | /driver/orders/{order}/cancel | Driver\OrderController@cancel | driver.orders.cancel |
 
 ### Админ-панель
 | URL | Описание |
@@ -276,11 +296,14 @@ taxishop/
 - `isEmpty()` — проверка пустоты
 
 ### OrderService (`app/Services/OrderService.php`)
-Создание заказов в транзакции:
-- `createOrder(data, cartItems, driverId)` — создаёт Order + OrderItems, генерирует номер TS-######
+Создание и управление заказами:
+- `createOrder(data, cartItems, driverId)` — создаёт Order + OrderItems со статусом `pending`
+- `confirmOrder(order)` — подтверждает заказ, для pickup списывает сток водителя
+- `cancelOrder(order)` — отменяет заказ (статус `cancelled`)
+- `markDelivered(order)` — отмечает заказ как доставленный
 - `decrementDriverStock(driverId, productId, qty)` — уменьшает сток; удаляет запись если qty = 0
-- При оплате `cash` — сток списывается сразу
-- При `qr`/`delivery` — сток НЕ списывается (ожидание подтверждения)
+
+**Важно:** Сток списывается ТОЛЬКО при вызове `confirmOrder()`, НЕ при создании заказа.
 
 ---
 
@@ -304,7 +327,10 @@ Product
 
 Order
  ├── belongsTo → User (driver)
- └── hasMany → OrderItem
+ ├── hasMany → OrderItem
+ ├── isPickup() — проверка типа pickup
+ ├── isDelivery() — проверка типа delivery
+ └── isPending() — проверка статуса pending
 
 OrderItem
  ├── belongsTo → Order
@@ -324,7 +350,7 @@ DriverStock
 | ProductResource | `app/Filament/Resources/ProductResource.php` | CRUD товаров, загрузка изображений, фильтры, массовые действия |
 | CategoryResource | `app/Filament/Resources/CategoryResource.php` | CRUD категорий с иерархией |
 | DriverResource | `app/Filament/Resources/DriverResource.php` | CRUD водителей + управление стоком (RelationManager) |
-| OrderResource | `app/Filament/Resources/OrderResource.php` | Просмотр заказов (read-only), смена статусов, фильтры |
+| OrderResource | `app/Filament/Resources/OrderResource.php` | Просмотр заказов, смена статусов, **фильтр по типу** (pickup/delivery), фильтр по статусу/оплате/водителю/дате |
 
 ### Виджеты дашборда (`app/Filament/Widgets/`)
 - **StatsOverview** — ключевые метрики
@@ -334,16 +360,29 @@ DriverStock
 
 ---
 
+## Layouts (макеты страниц)
+
+| Layout | Файл | Назначение |
+|--------|------|-----------|
+| Shop | `layouts/shop.blade.php` | Магазин для клиента (планшет): header с поиском, cart badge, lang switcher |
+| Driver | `layouts/driver.blade.php` | Кабинет водителя (смартфон): зелёная шапка, имя водителя, без корзины/поиска |
+| Auth | `layouts/auth.blade.php` | Страница входа |
+
+**Разделение интерфейсов:** Shop layout НЕ содержит ссылок на кабинет водителя. Driver layout НЕ содержит элементов магазина (корзина, поиск).
+
+---
+
 ## Мультиязычность
 
 Файлы переводов: `lang/{ru,en,uz}/shop.php`
 
 Содержат ключи для:
 - Навигации (categories, home, cart, search)
-- Товаров (price, add_to_cart, in_stock, out_of_stock)
+- Товаров (price, add_to_cart, in_stock, buy_on_spot, order_delivery)
 - Корзины (cart_empty, total, checkout)
-- Оформления заказа (customer_name, phone, payment_method, place_order)
-- Страницы подтверждения (order_success, order_number)
+- Оформления заказа (pickup_on_spot, delivery_to_home, payment methods)
+- Страницы ожидания (order_created, waiting_driver_confirmation)
+- Кабинета водителя (driver_panel, pending_orders, confirm_btn, cancel_btn)
 - Страницы логина (login, password, remember_me)
 
 ---

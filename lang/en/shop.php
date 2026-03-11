@@ -106,6 +106,7 @@ return [
     'need_help' => 'Need help? Call:',
 
     // Driver panel
+    'driver_panel' => 'Driver Panel',
     'driver_orders' => 'My Orders',
     'pending_orders' => 'Pending',
     'order_history' => 'History',

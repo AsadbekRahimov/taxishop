@@ -106,6 +106,7 @@ return [
     'need_help' => 'Нужна помощь? Звоните:',
 
     // Driver panel
+    'driver_panel' => 'Кабинет водителя',
     'driver_orders' => 'Мои заказы',
     'pending_orders' => 'Ожидающие',
     'order_history' => 'История',
