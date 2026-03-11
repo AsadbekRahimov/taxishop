@@ -40,7 +40,7 @@ taxishop/
 │   │   │   ├── Driver/
 │   │   │   │   └── OrderController.php      # Кабинет водителя: подтверждение/отклонение заказов
 │   │   │   ├── Shop/
-│   │   │   │   ├── HomeController.php        # Главная: категории + бестселлеры
+│   │   │   │   ├── HomeController.php        # Главная: 2 блока (в машине / доставка) + листинги /in-car, /delivery
 │   │   │   │   ├── ProductController.php     # Страница товара + breadcrumbs
 │   │   │   │   ├── CategoryController.php    # Список товаров в категории + сортировка
 │   │   │   │   ├── CartController.php        # Добавление/обновление/удаление корзины
@@ -97,7 +97,9 @@ taxishop/
 │   │   │   ├── auth.blade.php    # Layout для страницы входа
 │   │   │   └── site.blade.php    # Legacy layout
 │   │   ├── shop/                 # Страницы магазина (планшет клиента)
-│   │   │   ├── home.blade.php    # Главная: баннер-карусель, категории, бестселлеры
+│   │   │   ├── home.blade.php    # Главная: 2 блока (в машине / доставка), превью товаров, категории
+│   │   │   ├── in-car.blade.php  # Листинг «Товары в машине» (из стока водителя) + сортировка
+│   │   │   ├── delivery.blade.php# Листинг «Доставка на дом» (все прочие товары) + сортировка
 │   │   │   ├── product.blade.php # Детальная страница товара (кнопки: купить на месте / доставка)
 │   │   │   ├── category.blade.php# Товары в категории + сортировка
 │   │   │   ├── cart.blade.php    # Корзина с управлением количеством
@@ -248,6 +250,8 @@ taxishop/
 | Метод | URL | Контроллер | Имя маршрута |
 |-------|-----|-----------|--------------|
 | GET | / | HomeController@index | home |
+| GET | /in-car | HomeController@inCar | products.in-car |
+| GET | /delivery | HomeController@delivery | products.delivery |
 | GET | /category/{slug} | CategoryController@show | category.show |
 | GET | /product/{slug} | ProductController@show | product.show |
 | GET | /search | SearchController@search | search |
@@ -378,6 +382,8 @@ DriverStock
 
 Содержат ключи для:
 - Навигации (categories, home, cart, search)
+- Главной страницы (in_car_title, delivery_title, in_car_subtitle, delivery_subtitle, view_all)
+- Листингов (in_car_page_desc, delivery_page_desc, in_car_empty, delivery_empty, browse_delivery, browse_in_car)
 - Товаров (price, add_to_cart, in_stock, buy_on_spot, order_delivery)
 - Корзины (cart_empty, total, checkout)
 - Оформления заказа (pickup_on_spot, delivery_to_home, payment methods)
