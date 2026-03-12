@@ -75,6 +75,31 @@
                 </div>
             @endif
 
+            {{-- Video --}}
+            @if($product->video_url)
+                <div class="bg-bg-color rounded-xl p-5 mb-6">
+                    <h3 class="font-bold text-lg mb-3">{{ __('shop.product_video') }}</h3>
+                    <div class="aspect-video w-full rounded-xl overflow-hidden relative">
+                        @php
+                            $videoUrl = $product->video_url;
+                            $embedUrl = $videoUrl;
+                            
+                            // Transform YouTube URLs to embed URLs
+                            if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $videoUrl, $matches)) {
+                                $embedUrl = 'https://www.youtube.com/embed/' . $matches[1];
+                            }
+                        @endphp
+                        <iframe 
+                            src="{{ $embedUrl }}" 
+                            class="absolute top-0 left-0 w-full h-full"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            @endif
+
             {{-- Action Buttons --}}
             <div class="space-y-3">
                 {{-- Buy on the spot (pickup) - only if in stock --}}

@@ -21,6 +21,7 @@ class Product extends Model
         'main_image',
         'is_active',
         'is_deliverable',
+        'video_url',
     ];
 
     protected $casts = [

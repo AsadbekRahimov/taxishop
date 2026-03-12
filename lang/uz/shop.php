@@ -43,6 +43,7 @@ return [
     'in_car_badge' => 'Mashinada',
     'in_car_qty' => 'Mashinada bor (:qty dona)',
     'about_product' => 'Mahsulot haqida',
+    'product_video' => 'Mahsulot videosi',
     'buy_from_driver' => 'Haydovchidan sotib olish',
     'buy_on_spot' => 'Hozir sotib olish',
     'not_in_car' => 'Mashinada yo\'q',

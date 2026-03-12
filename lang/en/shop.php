@@ -43,6 +43,7 @@ return [
     'in_car_badge' => 'In car',
     'in_car_qty' => 'In the car (:qty pcs.)',
     'about_product' => 'About product',
+    'product_video' => 'Product video',
     'buy_from_driver' => 'Buy from driver',
     'buy_on_spot' => 'Buy now',
     'not_in_car' => 'Not in car',

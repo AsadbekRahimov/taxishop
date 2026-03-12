@@ -98,6 +98,12 @@ class ProductResource extends Resource
                             ->required()
                             ->columnSpanFull(),
 
+                        Forms\Components\TextInput::make('video_url')
+                            ->label('Ссылка на видео (YouTube и др.)')
+                            ->url()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+
                         Forms\Components\Repeater::make('images')
                             ->label('Дополнительные фото')
                             ->relationship()

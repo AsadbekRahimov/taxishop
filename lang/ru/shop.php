@@ -43,6 +43,7 @@ return [
     'in_car_badge' => 'В машине',
     'in_car_qty' => 'Есть в машине (:qty шт.)',
     'about_product' => 'О товаре',
+    'product_video' => 'Видео о товаре',
     'buy_from_driver' => 'Купить у водителя',
     'buy_on_spot' => 'Купить на месте',
     'not_in_car' => 'Нет в машине',
