@@ -2,6 +2,18 @@
 
 @section('title', $product->name)
 
+@section('meta')
+    <meta property="og:title" content="{{ $product->name }}">
+    <meta property="og:description" content="{{ \Illuminate\Support\Str::limit(strip_tags($product->description), 150) }}">
+    <meta property="og:image" content="{{ $product->main_image ? asset('storage/' . $product->main_image) : 'https://placehold.co/600x600/F3F4F6/1B5E20?text=' . urlencode($product->name) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="product">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $product->name }}">
+    <meta name="twitter:description" content="{{ \Illuminate\Support\Str::limit(strip_tags($product->description), 150) }}">
+    <meta name="twitter:image" content="{{ $product->main_image ? asset('storage/' . $product->main_image) : 'https://placehold.co/600x600/F3F4F6/1B5E20?text=' . urlencode($product->name) }}">
+@endsection
+
 @section('content')
 @php
     $allImages = collect();
