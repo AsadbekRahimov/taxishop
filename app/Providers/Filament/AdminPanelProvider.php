@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(\App\Filament\Pages\Auth\Login::class)
             ->brandName('TaxiShop Admin')
+            ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Green,
             ])
