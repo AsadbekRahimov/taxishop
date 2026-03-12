@@ -30,6 +30,7 @@ class TopProducts extends BaseWidget
             ->columns([
                 Tables\Columns\ImageColumn::make('main_image')
                     ->label('Фото')
+                    ->disk('public')
                     ->circular(),
 
                 Tables\Columns\TextColumn::make('name')

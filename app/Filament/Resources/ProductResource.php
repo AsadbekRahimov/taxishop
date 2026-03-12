@@ -93,6 +93,7 @@ class ProductResource extends Resource
                         Forms\Components\FileUpload::make('main_image')
                             ->label('Главное фото')
                             ->image()
+                            ->disk('public')
                             ->directory('products')
                             ->required()
                             ->columnSpanFull(),
@@ -104,6 +105,7 @@ class ProductResource extends Resource
                                 Forms\Components\FileUpload::make('image_path')
                                     ->label('Фото')
                                     ->image()
+                                    ->disk('public')
                                     ->directory('products')
                                     ->required(),
 
@@ -139,6 +141,7 @@ class ProductResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('main_image')
                     ->label('Фото')
+                    ->disk('public')
                     ->circular(),
 
                 Tables\Columns\TextColumn::make('name')

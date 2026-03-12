@@ -63,6 +63,7 @@ class StockRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\ImageColumn::make('product.main_image')
                     ->label('Фото')
+                    ->disk('public')
                     ->circular(),
 
                 Tables\Columns\TextColumn::make('product.name')

@@ -64,6 +64,7 @@ class CategoryResource extends Resource
                         Forms\Components\FileUpload::make('icon')
                             ->label('Иконка')
                             ->image()
+                            ->disk('public')
                             ->directory('categories')
                             ->nullable(),
 
@@ -83,6 +84,7 @@ class CategoryResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('icon')
                     ->label('Иконка')
+                    ->disk('public')
                     ->circular()
                     ->defaultImageUrl(fn () => null),
 
