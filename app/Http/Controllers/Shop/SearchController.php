@@ -18,15 +18,26 @@ class SearchController extends Controller
         $products = Product::query()
             ->where('is_active', true)
             ->when($q !== '', function ($query) use ($q) {
-                $query->where('name', 'LIKE', '%' . $q . '%');
+                $terms = array_filter(explode(' ', mb_strtolower($q)));
+                
+                $query->where(function ($query) use ($terms) {
+                    foreach ($terms as $term) {
+                        $query->where(function ($subQuery) use ($term) {
+                            $subQuery->whereRaw('LOWER(name) LIKE ?', ['%' . $term . '%'])
+                                     ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $term . '%']);
+                        });
+                    }
+                });
             })
             ->paginate(12)
             ->withQueryString();
 
-        $inStockProductIds = auth()->user()
-            ->driverStock()
-            ->pluck('product_id')
-            ->toArray();
+        $inStockProductIds = auth()->check()
+            ? auth()->user()
+                ->driverStock()
+                ->pluck('product_id')
+                ->toArray()
+            : [];
 
         return view('shop.search', compact('products', 'q', 'inStockProductIds'));
     }
